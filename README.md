@@ -159,7 +159,9 @@ The project includes Docker support for development:
 ## Production URLs
 - Application: https://drawing-viewer-sooty.vercel.app/
 - Supabase Project: https://supabase.com/dashboard/projects
-
+-Login detail :- Email :- anwar15298@gmail.com
+                 Password : Anwar@321
+                 
 ## License
 
 This project is licensed under the MIT License.
