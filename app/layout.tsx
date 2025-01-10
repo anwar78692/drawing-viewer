@@ -1,7 +1,12 @@
 import Script from 'next/script';
+import { ReactNode } from 'react';
 import './globals.css';
 
-export default function Layout({ children }) {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <head>
@@ -20,7 +25,6 @@ export default function Layout({ children }) {
           © 2025 Drawing Viewer
         </footer>
 
-        {/* Add the Forge Viewer script */}
         <Script
           src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.min.js?v=v7.*"
           strategy="beforeInteractive"
