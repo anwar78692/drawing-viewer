@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Drawer from '../components/Drawer';
 import toast from 'react-hot-toast';
 import FileList from '../components/FileList';
+import { signOut } from '../utils/auth';
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -63,6 +64,7 @@ export default function UploadPage() {
       setUploading(false);
     }
   };
+  
 
   if (loading) return <div className="flex items-center justify-center h-screen">Loading...</div>;
 
@@ -74,7 +76,9 @@ export default function UploadPage() {
       >
         Open Drawer
       </button>
+
       <FileList/>
+      {/* <button onClick={handleLogout}>Logout</button> */}
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}

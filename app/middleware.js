@@ -1,15 +1,26 @@
 import { NextResponse } from 'next/server';
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 
-export function middleware(req) {
-  const token = req.cookies.get('sb-access-token');
+export async function middleware(req) {
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
 
-  if (!token && req.nextUrl.pathname.startsWith('/upload')) {
-    return NextResponse.redirect(new URL('/auth', req.url));
+  // Check active session
+  const { data: { session } } = await supabase.auth.getSession();
+
+  // If user is logged in and tries to access login page
+  if (session && req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/upload', req.url));
   }
 
-  return NextResponse.next();
+  // If user is not logged in and tries to access protected routes
+  if (!session && req.nextUrl.pathname.startsWith('/upload')) {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
+  return res;
 }
 
 export const config = {
-  matcher: ['/upload', '/viewer'],
+  matcher: ['/', '/upload', '/viewer']
 };
