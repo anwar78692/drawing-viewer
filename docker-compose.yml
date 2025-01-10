@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_FORGE_CLIENT_ID=${NEXT_PUBLIC_FORGE_CLIENT_ID}
+      - FORGE_CLIENT_SECRET=${FORGE_CLIENT_SECRET}
+    command: npm run dev
+    # Enable hot reload
+    develop:
+      watch:
+        - path: ./package.json
+          action: rebuild
+        - path: ./next.config.js
+          action: rebuild
+        - path: .
+          target: /app
+          action: sync
+
+networks:
+  app-network:
+    driver: bridge
