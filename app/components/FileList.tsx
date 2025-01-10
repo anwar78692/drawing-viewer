@@ -2,14 +2,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
 
+// Update the FileItem interface to match Supabase's return type
 interface FileItem {
   name: string;
   id: string;
-  metadata: {
-    mimetype: string;
-    size: number;
-  };
+  metadata: Record<string, any>;  // Changed to match Supabase's metadata type
   created_at: string;
+  publicUrl?: string;  // Added optional publicUrl
+  bucket_id?: string;
+  owner?: string;
+  updated_at?: string;
+  last_accessed_at?: string;
 }
 
 export default function FileList() {
@@ -18,52 +21,44 @@ export default function FileList() {
   useEffect(() => {
     fetchFiles();
   }, []);
+
   async function fetchFiles() {
     try {
       const { data: fileList } = await supabase
         .storage
         .from('drawings')
         .list('public');
-  
+
       if (fileList) {
-        const filesWithUrls = fileList.map((file) => {
-          // Use createSignedUrl instead of getPublicUrl
-          const signedUrl = supabase
-            .storage
-            .from('drawings')
-            .createSignedUrl(`public/${file.name}`, 60 * 60) // 1 hour expiry
-            .then(({ data }) => data?.signedUrl);
-          
-          return {
-            ...file,
-            publicUrl: signedUrl
-          };
-        });
-  
-        // Wait for all signed URLs to be generated
-        const resolvedFiles = await Promise.all(
-          filesWithUrls.map(async (file) => ({
-            ...file,
-            publicUrl: await file.publicUrl
-          }))
+        const filesWithUrls = await Promise.all(
+          fileList.map(async (file) => {
+            const { data } = await supabase
+              .storage
+              .from('drawings')
+              .createSignedUrl(`public/${file.name}`, 60 * 60);
+
+            return {
+              ...file,
+              publicUrl: data?.signedUrl
+            } as FileItem;  // Type assertion to FileItem
+          })
         );
         
-        setFiles(resolvedFiles);
+        setFiles(filesWithUrls);
       }
     } catch (error) {
       console.error('Error fetching files:', error);
     }
   }
-  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       {files.map((file) => (
         <div key={file.id} className="border rounded-lg p-4 shadow hover:shadow-md transition-shadow">
           <div className="aspect-square mb-2">
-            {file.metadata.mimetype.startsWith('image/') ? (
+            {file.metadata.mimetype?.startsWith('image/') ? (
               <img 
-                src={file.publicUrl} // Use the full Supabase public URL
+                src={file.publicUrl} 
                 alt={file.name}
                 className="w-full h-full object-cover rounded-lg"
               />
