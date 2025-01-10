@@ -157,7 +157,7 @@ The project includes Docker support for development:
 4. Deploy
 
 ## Production URLs
-- Application: https://your-app-url.vercel.app
+- Application: https://drawing-viewer-sooty.vercel.app/
 - Supabase Project: https://supabase.com/dashboard/projects
 
 ## License
